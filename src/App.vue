@@ -1,16 +1,19 @@
 <script setup>
 import HeaderComponent from './components/HeaderComponent.vue'
-import CardItem from './components/CardItem.vue'
+import CardList from './components/CardList.vue'
 </script>
 
 <template>
 
-  <div class="bg-white w-4/5 m-auto h-screen rounded-xl shadow-xl mt-14">
+  <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
     <HeaderComponent />
 
-    <div>
-      <CardItem/>
+    <div class="p-10">
+      <h2 class="text-3xl font-bold mb-8">Все Кросовки</h2>
+
+      <CardList />
     </div>
+
 
 
   </div>
