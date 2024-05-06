@@ -1,6 +1,5 @@
 <script setup>
-import { onMounted, reactive, watch } from 'vue';
-import { ref } from 'vue';
+import { onMounted, provide, reactive, watch, ref } from 'vue';
 import axios from 'axios'
 
 import HeaderComponent from './components/HeaderComponent.vue'
@@ -22,6 +21,10 @@ const filters = reactive({
   searchQuery: '',
 })
 
+const addToFavorite = async (item) => {
+  item.isFavorite = !item.isFavorite
+}
+
 const fetchItems = async () => {
 
   try {
@@ -35,16 +38,47 @@ const fetchItems = async () => {
     const { data } = await axios.get('https://84071b17c3fd0acd.mokky.dev/items', {
       params
     });
-    items.value = data;
+    items.value = data.map((obj) => ({
+      ...obj,
+      isFavorites: false,
+      isAdded: false
+
+    }))
   } catch (e) {
     console.log(e)
   }
 }
 
-onMounted(fetchItems)
+const fetchFavorites = async () => {
+
+  try {
+
+    const { data: favorites } = await axios.get('https://84071b17c3fd0acd.mokky.dev/favorites');
+    items.value = items.value.map((item) => {
+      const favorite = favorites.find((favorite) => favorite.parentId === item.id)
+
+      if (!favorite) {
+        return item
+      }
+
+      return {
+        ...item,
+        isFavorite: true,
+        favoriteId: favorite.id
+      }
+    });
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+onMounted(async () => {
+  await fetchItems();
+  await fetchFavorites();
+})
 watch(filters, fetchItems)
 
-
+provide('addToFavorite', addToFavorite)
 
 </script>
 
@@ -69,8 +103,8 @@ watch(filters, fetchItems)
 
           <div class="relative">
             <img class="absolute left-4 top-3" src="/search.svg" />
-            <input @input="onChangeSearch" type="text" class=" border rounded-md py-2 pl-12 pr-4 outline-none focus:border-gray-400"
-              placeholder="Поиск..." />
+            <input @input="onChangeSearch" type="text"
+              class=" border rounded-md py-2 pl-12 pr-4 outline-none focus:border-gray-400" placeholder="Поиск..." />
           </div>
         </div>
 
