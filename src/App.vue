@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, provide, reactive, watch, ref } from 'vue';
+import { onMounted, reactive, watch, ref } from 'vue';
 import axios from 'axios'
 
 import HeaderComponent from './components/HeaderComponent.vue'
@@ -22,7 +22,23 @@ const filters = reactive({
 })
 
 const addToFavorite = async (item) => {
-  item.isFavorite = !item.isFavorite
+  try {
+    if (!item.isFavorite) {
+      const obj = {
+      parentId: item.id
+    }
+    const { data } = await axios.post(`https://84071b17c3fd0acd.mokky.dev/favorites`, obj)
+    item.isFavorite = true
+    item.favoriteId = data.id
+    } else {
+      await axios.delete(`https://84071b17c3fd0acd.mokky.dev/favorites/${item.favoriteId}`)
+      item.isFavorite = false
+      item.favoriteId = null
+    }
+
+  } catch (er) {
+    console.log(er)
+  }
 }
 
 const fetchItems = async () => {
@@ -41,7 +57,8 @@ const fetchItems = async () => {
     items.value = data.map((obj) => ({
       ...obj,
       isFavorites: false,
-      isAdded: false
+      isAdded: false,
+      favoriteId: null,
 
     }))
   } catch (e) {
@@ -78,7 +95,7 @@ onMounted(async () => {
 })
 watch(filters, fetchItems)
 
-provide('addToFavorite', addToFavorite)
+// provide('addToFavorite', addToFavorite)
 
 </script>
 
@@ -110,7 +127,7 @@ provide('addToFavorite', addToFavorite)
 
       </div>
 
-      <CardList :items="items" />
+      <CardList :items="items" @addToFavorite="addToFavorite" />
     </div>
   </div>
 </template>
