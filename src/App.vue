@@ -1,12 +1,17 @@
 <script setup>
-import { onMounted, reactive, watch, ref } from 'vue';
+import { onMounted, reactive, watch, ref, provide} from 'vue';
 import axios from 'axios'
 
 import HeaderComponent from './components/HeaderComponent.vue'
 import CardList from './components/CardList.vue'
-// import DraverComponent from './components/DraverComponent.vue'
+import DraverComponent from './components/DraverComponent.vue'
 
 const items = ref([])
+const drawerOpen=ref(false)
+
+const handleDrawerOpen = () => {
+  drawerOpen.value = !drawerOpen.value
+}
 
 const onChangeValue = (event) => {
   filters.sortBy = event.target.value
@@ -96,14 +101,15 @@ onMounted(async () => {
 watch(filters, fetchItems)
 
 // provide('addToFavorite', addToFavorite)
+provide('handleDrawerOpen', handleDrawerOpen)
 
 </script>
 
 <template>
-  <!-- <DraverComponent /> -->
+  <DraverComponent v-if="drawerOpen"/>
 
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
-    <HeaderComponent />
+    <HeaderComponent @handle-drawer-open="handleDrawerOpen"/>
 
     <div class="p-10">
 
@@ -127,7 +133,7 @@ watch(filters, fetchItems)
 
       </div>
 
-      <CardList :items="items" @addToFavorite="addToFavorite" />
+      <CardList :items="items" @add-to-favorite="addToFavorite" />
     </div>
   </div>
 </template>

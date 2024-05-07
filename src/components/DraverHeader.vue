@@ -1,6 +1,14 @@
+<script setup>
+import { inject } from "vue";
+
+const handleDrawerOpen = inject('handleDrawerOpen')
+</script>
+
+
 <template>
       <h2 class="text-2xl font-bold mb-10 flex items-center gap-5">
       <svg
+      @click="handleDrawerOpen"
         class="rotate-180 hover:-translate-x-1 opacity-30 hover:opacity-100 transition cursor-pointer"
         width="16"
         height="14"
