@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, watch, ref, provide} from 'vue';
+import { onMounted, reactive, watch, ref, provide } from 'vue';
 import axios from 'axios'
 
 import HeaderComponent from './components/HeaderComponent.vue'
@@ -7,7 +7,8 @@ import CardList from './components/CardList.vue'
 import DraverComponent from './components/DraverComponent.vue'
 
 const items = ref([])
-const drawerOpen=ref(false)
+const cartItems = ref([])
+const drawerOpen = ref(false)
 
 const handleDrawerOpen = () => {
   drawerOpen.value = !drawerOpen.value
@@ -26,15 +27,25 @@ const filters = reactive({
   searchQuery: '',
 })
 
+const addToCart = (item) => {
+    cartItems.value.push(item)
+    item.isAdded = true
+  } 
+
+const removeFromCart = (item) => {
+    cartItems.value.splice(cartItems.value.indexOf(item), 1)
+    item.isAdded = false
+  }
+
 const addToFavorite = async (item) => {
   try {
     if (!item.isFavorite) {
       const obj = {
-      parentId: item.id
-    }
-    const { data } = await axios.post(`https://84071b17c3fd0acd.mokky.dev/favorites`, obj)
-    item.isFavorite = true
-    item.favoriteId = data.id
+        parentId: item.id
+      }
+      const { data } = await axios.post(`https://84071b17c3fd0acd.mokky.dev/favorites`, obj)
+      item.isFavorite = true
+      item.favoriteId = data.id
     } else {
       await axios.delete(`https://84071b17c3fd0acd.mokky.dev/favorites/${item.favoriteId}`)
       item.isFavorite = false
@@ -102,14 +113,19 @@ watch(filters, fetchItems)
 
 // provide('addToFavorite', addToFavorite)
 provide('handleDrawerOpen', handleDrawerOpen)
+provide('cartItems', cartItems)
+provide('cartAction', {
+  addToCart,
+  removeFromCart,
+})
 
 </script>
 
 <template>
-  <DraverComponent v-if="drawerOpen"/>
+  <DraverComponent v-if="drawerOpen" />
 
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
-    <HeaderComponent @handle-drawer-open="handleDrawerOpen"/>
+    <HeaderComponent @handle-drawer-open="handleDrawerOpen" />
 
     <div class="p-10">
 
@@ -133,7 +149,7 @@ provide('handleDrawerOpen', handleDrawerOpen)
 
       </div>
 
-      <CardList :items="items" @add-to-favorite="addToFavorite" />
+      <CardList :items="items" @add-to-favorite="addToFavorite" @add-to-cart="addToCart" />
     </div>
   </div>
 </template>
