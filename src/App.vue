@@ -135,6 +135,12 @@ onMounted(async () => {
   await fetchFavorites();
 })
 watch(filters, fetchItems)
+watch (cartItems, () => {
+  items.value = items.value.map((item) => ({
+    ...item,
+    isAdded:false
+  }))
+})
 
 // provide('addToFavorite', addToFavorite)
 provide('handleDrawerOpen', handleDrawerOpen)
