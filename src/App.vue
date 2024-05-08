@@ -19,6 +19,8 @@ const handleDrawerOpen = () => {
   drawerOpen.value = !drawerOpen.value
 }
 
+const cartButtonDisabled = computed(() => isCreatedOrder.value ? true : totalPrice.value ? false : true)
+
 const onChangeValue = (event) => {
   filters.sortBy = event.target.value
 }
@@ -147,7 +149,7 @@ provide('cartAction', {
 <template>
   <DraverComponent 
     v-if="drawerOpen" 
-    :is-created-order = 'isCreatedOrder'
+    :button-disabled = 'cartButtonDisabled'
     :total-price="totalPrice" 
     :vat-price="vatPrice" 
     @create-order="createOrder"/>

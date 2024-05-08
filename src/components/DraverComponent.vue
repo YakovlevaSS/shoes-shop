@@ -1,17 +1,15 @@
 <script setup>
 import DraverHeader from './DraverHeader.vue';
 import DraverCardList from './DraverCardList.vue';
-import { computed } from 'vue';
 
-const props = defineProps({
+defineProps({
   totalPrice: Number,
   vatPrice: Number,
-  isCreatedOrder: Boolean,
+  buttonDisabled: Boolean,
 });
 
 const emit = defineEmits(['createOrder'])
 
-const buttonDisabled = computed(() => props.isCreatedOrder ? true : props.totalPrice ? false : true)
 </script>
 
 <template>
@@ -41,7 +39,7 @@ const buttonDisabled = computed(() => props.isCreatedOrder ? true : props.totalP
         <button 
           :disabled="buttonDisabled"
           @click="() => emit('createOrder')"
-          class="flex justify-center items-center gap-3 w-full py-3 mt-4 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600">
+          class="flex justify-center items-center gap-3 w-full py-3 mt-4 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600 disabled:bg-slate-300">
           Оформить заказ
           <img src="/arrow-next.svg" alt="Arrow" />
         </button>
