@@ -1,6 +1,7 @@
 <script setup>
 import DraverHeader from './DraverHeader.vue';
 import DraverCardList from './DraverCardList.vue';
+import InfoBlog from './InfoBlog.vue'
 
 defineProps({
   totalPrice: Number,
@@ -18,9 +19,17 @@ const emit = defineEmits(['createOrder'])
 
     <DraverHeader />
 
-    <DraverCardList />
+    <div v-if="!totalPrice" class="flex h-full items-center">
+      <InfoBlog 
+        title="Корзина пустая"
+        description="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ."
+        image-url="/package-icon.png"
+      />
+    </div>
 
-    <div class="flex flex-col flex-1 mt-7">
+    <DraverCardList v-if="totalPrice"/>
+
+    <div v-if="totalPrice" class="flex flex-col flex-1 mt-7">
       <div>
         <div class="flex flex-col gap-5">
           <div class="flex items-end gap-2">
@@ -36,9 +45,7 @@ const emit = defineEmits(['createOrder'])
           </div>
         </div>
 
-        <button 
-          :disabled="buttonDisabled"
-          @click="() => emit('createOrder')"
+        <button :disabled="buttonDisabled" @click="() => emit('createOrder')"
           class="flex justify-center items-center gap-3 w-full py-3 mt-4 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600 disabled:bg-slate-300">
           Оформить заказ
           <img src="/arrow-next.svg" alt="Arrow" />

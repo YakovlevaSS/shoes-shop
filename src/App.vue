@@ -131,16 +131,28 @@ const fetchFavorites = async () => {
 }
 
 onMounted(async () => {
+  cartItems.value = JSON.parse(localStorage.getItem('cartItems') || '[]')
   await fetchItems();
   await fetchFavorites();
-})
-watch(filters, fetchItems)
-watch (cartItems, () => {
+
   items.value = items.value.map((item) => ({
     ...item,
-    isAdded:false
+    isAdded: cartItems.value.some((cartItem) => cartItem.id === item.id)
   }))
 })
+watch(filters, fetchItems)
+watch(cartItems, () => {
+  items.value = items.value.map((item) => ({
+    ...item,
+    isAdded: false
+  }))
+})
+
+watch(cartItems, () => {
+  localStorage.setItem('cartItems', JSON.stringify(cartItems.value))
+},
+  { deep: true }
+)
 
 // provide('addToFavorite', addToFavorite)
 provide('handleDrawerOpen', handleDrawerOpen)
@@ -153,12 +165,8 @@ provide('cartAction', {
 </script>
 
 <template>
-  <DraverComponent 
-    v-if="drawerOpen" 
-    :button-disabled = 'cartButtonDisabled'
-    :total-price="totalPrice" 
-    :vat-price="vatPrice" 
-    @create-order="createOrder"/>
+  <DraverComponent v-if="drawerOpen" :button-disabled='cartButtonDisabled' :total-price="totalPrice"
+    :vat-price="vatPrice" @create-order="createOrder" />
 
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
     <HeaderComponent :total-price="totalPrice" @handle-drawer-open="handleDrawerOpen" />
