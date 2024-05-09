@@ -2,7 +2,6 @@
 import { watch, ref, provide, computed } from 'vue';
 import axios from 'axios'
 
-import HomePage from './pages/HomePage.vue'
 import HeaderComponent from './components/HeaderComponent.vue'
 import DraverComponent from './components/DraverComponent.vue'
 
@@ -72,7 +71,7 @@ provide('cartAction', {
     <HeaderComponent :total-price="totalPrice" @handle-drawer-open="handleDrawerOpen" />
 
     <div class="p-10">
-      <HomePage/>
+      <router-view/>
     </div>
   </div>
 </template>
