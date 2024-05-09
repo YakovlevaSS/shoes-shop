@@ -1,16 +1,39 @@
 <script setup>
+import axios from 'axios'
 import DraverHeader from './DraverHeader.vue';
 import DraverCardList from './DraverCardList.vue';
 import InfoBlog from './InfoBlog.vue'
 
-defineProps({
+import { ref, computed, inject } from 'vue';
+
+const props = defineProps({
   totalPrice: Number,
   vatPrice: Number,
-  buttonDisabled: Boolean,
 });
 
-const emit = defineEmits(['createOrder'])
+const isCreatedOrder = ref(false)
+const orderId = ref(null)
+const cartItems = inject('cartItems')
 
+const createOrder = async () => {
+  try {
+    isCreatedOrder.value = true
+    const { data } = await axios.post(`https://84071b17c3fd0acd.mokky.dev/orders`, {
+      items: cartItems.value,
+      totalPrice: props.totalPrice,
+    })
+
+    cartItems.value = []
+
+    orderId.value = data.id
+  } catch (er) {
+    console.log(er)
+  } finally {
+    isCreatedOrder.value = false
+  }
+}
+
+const cartButtonDisabled = computed(() => isCreatedOrder.value ? true : props.totalPrice ? false : true)
 </script>
 
 <template>
@@ -19,15 +42,22 @@ const emit = defineEmits(['createOrder'])
 
     <DraverHeader />
 
-    <div v-if="!totalPrice" class="flex h-full items-center">
-      <InfoBlog 
+    <div v-if="!totalPrice || orderId" class="flex h-full items-center">
+      <InfoBlog
+        v-if="!totalPrice && !orderId"
         title="Корзина пустая"
         description="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ."
         image-url="/package-icon.png"
       />
+      <InfoBlog
+        v-if="orderId"
+        title="Заказ оформлен!"
+        :description="`Ваш заказ #${orderId} скоро будет передан курьерской доставке`"
+        image-url="/order-success-icon.png"
+      />
     </div>
 
-    <DraverCardList v-if="totalPrice"/>
+    <DraverCardList v-if="totalPrice" />
 
     <div v-if="totalPrice" class="flex flex-col flex-1 mt-7">
       <div>
@@ -45,7 +75,7 @@ const emit = defineEmits(['createOrder'])
           </div>
         </div>
 
-        <button :disabled="buttonDisabled" @click="() => emit('createOrder')"
+        <button :disabled="cartButtonDisabled" @click="createOrder"
           class="flex justify-center items-center gap-3 w-full py-3 mt-4 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600 disabled:bg-slate-300">
           Оформить заказ
           <img src="/arrow-next.svg" alt="Arrow" />
