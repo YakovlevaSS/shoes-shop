@@ -37,6 +37,12 @@ const emit = defineEmits(['handleDrawerOpen'])
                     <span>Профиль</span>
                 </li>
             </router-link>
+            <router-link to="/add-new">
+                <li class="flex items-center gap-4 hover:text-black cursor-pointer">
+                    <img src="/profile.svg" alt="Cart" />
+                    <span>Добавить товар</span>
+                </li>
+            </router-link>
         </ul>
 
     </header>
