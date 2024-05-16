@@ -97,8 +97,8 @@ const validationSchema = toTypedSchema(
             .min(1, "Поле пустое"),
     }))
 
-const { handleSubmit, errors } = useForm({ validationSchema })
-const { value: email } = useField("email");
+const { handleSubmit, errors } = useForm({ validationSchema, validateOnValueUpdate: false })
+const { value: email} = useField("email");
 const { value: password } = useField("password");
 const onSubmit = handleSubmit((value) => {
     alert(JSON.stringify(value, null, 2))
